@@ -34,7 +34,6 @@ OpenRelTable::OpenRelTable(){
     RelCacheTable::relCache[ATTRCAT_RELID] = (struct RelCacheEntry*)malloc(sizeof(RelCacheEntry));
     *(RelCacheTable::relCache[ATTRCAT_RELID]) = relCacheEntry;
 
-    
     /************ Setting up Attribute cache entries ************/
    
     RecBuffer attrCatBlock(ATTRCAT_BLOCK);
@@ -68,3 +67,10 @@ OpenRelTable::OpenRelTable(){
 }
 
 OpenRelTable::~OpenRelTable(){}
+
+int OpenRelTable::getRelId(char relName[ATTR_SIZE]){
+    if(strcmp(relName,RELCAT_RELNAME) == 0) return RELCAT_RELID;
+    if(strcmp(relName,ATTRCAT_RELNAME) == 0) return ATTRCAT_RELID;
+    
+    return E_RELNOTOPEN;
+}

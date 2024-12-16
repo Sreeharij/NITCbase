@@ -67,3 +67,31 @@ int BlockBuffer::loadBlockAndGetBufferPtr(unsigned char **buffPtr){
 
     return SUCCESS;
 }
+
+int RecBuffer::getSlotMap(unsigned char* slotMap){
+    unsigned char *bufferPtr;
+
+    int ret = loadBlockAndGetBufferPtr(&bufferPtr);
+    if(ret != SUCCESS){
+        return ret;
+    }
+
+    struct HeadInfo head;
+    this->getHeader(&head);
+    int slotCount = head.numSlots;
+
+    unsigned char *slotMapInBuffer = bufferPtr + HEADER_SIZE;
+    
+    for(int slot = 0;slot < slotCount; slot++){
+        *(slotMap + slot) = *(slotMapInBuffer + slot);
+    }
+
+    return SUCCESS;
+}
+
+int compareAttrs(union Attribute attr1, union Attribute attr2, int attrType){
+    if(attrType == NUMBER){
+        return attr1.nVal > attr2.nVal ? 1 : (attr1.nVal < attr2.nVal ? -1 : 0);
+    }
+    return strcmp(attr1.sVal,attr2.sVal);
+}
