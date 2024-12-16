@@ -1,4 +1,4 @@
-//ALERT: understand where all we need to call the reset searchindex
+//ALERT: understand where we need to call the reset searchindex
 
 #include "Algebra.h"
 
