@@ -1,7 +1,7 @@
 #include "AttrCacheTable.h"
 
 #include <cstring>
-
+#include <iostream>
 AttrCacheEntry* AttrCacheTable::attrCache[MAX_OPEN];
 
 int AttrCacheTable::getAttrCatEntry(int relId, int attrOffset, AttrCatEntry* attrCatBuf){
@@ -34,6 +34,7 @@ int AttrCacheTable::getAttrCatEntry(int relId, char attrName[ATTR_SIZE], AttrCat
             return SUCCESS;
         }
     }
+    std::cout<<"Inside AttrCacheTable::getAttrCatEntry error: E_ATTRNOTEXIST"<<std::endl;
     return E_ATTRNOTEXIST;
 }
 

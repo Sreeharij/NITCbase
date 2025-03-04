@@ -276,3 +276,31 @@ int RecBuffer::setSlotMap(unsigned char *slotMap) {
 int BlockBuffer::getBlockNum(){
     return this->blockNum;
 }
+
+void BlockBuffer::releaseBlock(){
+    // if blockNum is INVALID_BLOCKNUM (-1), or it is invalidated already, do nothing
+    if(blockNum == INVALID_BLOCKNUM || StaticBuffer::blockAllocMap[blockNum] == UNUSED_BLK) return;
+    int bufferNum = StaticBuffer::getBufferNum(blockNum);
+    
+    if(bufferNum >= 0 && bufferNum < BUFFER_CAPACITY){
+        StaticBuffer::metainfo[bufferNum].free = true;
+    }   
+    StaticBuffer::blockAllocMap[blockNum] = UNUSED_BLK;
+    this->blockNum = INVALID_BLOCKNUM;
+    // else
+        /* get the buffer number of the buffer assigned to the block
+           using StaticBuffer::getBufferNum().
+           (this function return E_BLOCKNOTINBUFFER if the block is not
+           currently loaded in the buffer)
+            */
+
+        // if the block is present in the buffer, free the buffer
+        // by setting the free flag of its StaticBuffer::tableMetaInfo entry
+        // to true.
+
+        // free the block in disk by setting the data type of the entry
+        // corresponding to the block number in StaticBuffer::blockAllocMap
+        // to UNUSED_BLK.
+
+        // set the object's blockNum to INVALID_BLOCK (-1)
+}

@@ -84,7 +84,27 @@ OpenRelTable::~OpenRelTable(){
         }
     }
 
-    for(int relId=RELCAT_RELID;relId<+ATTRCAT_RELID;relId++){
+    if(RelCacheTable::relCache[ATTRCAT_RELID]->dirty == true){  
+        RelCatEntry relCatBuffer;
+        RelCacheTable::getRelCatEntry(ATTRCAT_RELID,&relCatBuffer);
+        Attribute relCatRecord[RELCAT_NO_ATTRS];
+        RelCacheTable::relCatEntryToRecord(&relCatBuffer,relCatRecord);
+        RecId recId = RelCacheTable::relCache[ATTRCAT_RELID]->recId;
+        RecBuffer relCatBlock[recId.block];
+        relCatBlock->setRecord(relCatRecord,recId.slot);
+    }
+
+    if(RelCacheTable::relCache[RELCAT_RELID]->dirty == true){
+        RelCatEntry relCatBuffer;
+		RelCacheTable::getRelCatEntry(RELCAT_RELID,&relCatBuffer);
+		Attribute relCatRecord[ATTRCAT_NO_ATTRS];
+		RelCacheTable::relCatEntryToRecord(&relCatBuffer,relCatRecord);
+		RecId recId=RelCacheTable::relCache[RELCAT_RELID]->recId;
+		RecBuffer attrCatRecord(recId.block);
+		attrCatRecord.setRecord(relCatRecord,recId.slot);
+    }
+
+    for(int relId=RELCAT_RELID;relId<=ATTRCAT_RELID;relId++){
         free(RelCacheTable::relCache[relId]);
 
         AttrCacheEntry *ptr = AttrCacheTable::attrCache[relId];
