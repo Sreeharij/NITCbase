@@ -341,31 +341,34 @@ int BlockAccess::insert(int relId, Attribute *record) {
     return SUCCESS;
 }
 
+int BlockAccess::search(int relId, Attribute *record, char attrName[ATTR_SIZE], Attribute attrVal, int op) {
+    // Declare a variable called recid to store the searched record
+    RecId recId;
 
-int BlockAccess::search(int relId, Attribute *record, char attrName[ATTR_SIZE],
-                        Attribute attrVal, int op) {
-  // Declare a variable called recid to store the searched record
-  RecId recId;
-  recId = BlockAccess::linearSearch(relId, attrName, attrVal, op);
+    /* get the attribute catalog entry from the attribute cache corresponding
+    to the relation with Id=relid and with attribute_name=attrName  */
+    AttrCatEntry attrCatEntry;
+    int ret=AttrCacheTable::getAttrCatEntry(relId,attrName,&attrCatEntry);
+    // if this call returns an error, return the appropriate error code
+    if(ret!=SUCCESS){
+		return ret;
+	}
+    // get rootBlock from the attribute catalog entry
+    int rootBlock=attrCatEntry.rootBlock;
+    if(rootBlock == -1){
+        recId=BlockAccess::linearSearch(relId,attrName,attrVal,op);
+    }
+    else{
+        recId = BPlusTree::bPlusSearch(relId,attrName,attrVal,op);
+    }
 
-  /* search for the record id (recid) corresponding to the attribute with
-  attribute name attrName, with value attrval and satisfying the condition op
-  using linearSearch() */
-  if (recId.block == -1 and recId.slot == -1)
-    return E_NOTFOUND;
+    if(recId.block == -1 && recId.slot == -1){
+        return E_NOTFOUND;
+    }
 
-  // if there's no record satisfying the given condition (recId = {-1, -1})
-  //    return E_NOTFOUND;
-  RecBuffer recBuffer(recId.block);
-  int ret = recBuffer.getRecord(record, recId.slot);
-  if (ret != SUCCESS)
-    return ret;
-  /* Copy the record with record id (recId) to the record buffer (record)
-     For this Instantiate a RecBuffer class object using recId and
-     call the appropriate method to fetch the record
-  */
-
-  return SUCCESS;
+    RecBuffer recordBlock(recId.block);
+    recordBlock.getRecord(record,recId.slot);
+    return SUCCESS;
 }
 
 int BlockAccess::deleteRelation(char relName[ATTR_SIZE]) {

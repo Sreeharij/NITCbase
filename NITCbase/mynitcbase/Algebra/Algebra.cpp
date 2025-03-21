@@ -61,6 +61,7 @@ int Algebra::select(char srcRel[ATTR_SIZE],char targetRel[ATTR_SIZE],char attr[A
     Attribute record[src_nAttrs];
 
     RelCacheTable::resetSearchIndex(srcRelId);
+    AttrCacheTable::resetSearchIndex(srcRelId, attr);
 
     RelCatEntry relCatEntry;
     RelCacheTable::getRelCatEntry(srcRelId,&relCatEntry);
