@@ -43,7 +43,8 @@ int BlockBuffer::getHeader(struct HeadInfo *head){
     if(ret != SUCCESS){
         return ret;
     }
-
+    memcpy(&head->blockType,bufferPtr, 4);
+    memcpy(&head->pblock, bufferPtr + 4, 4);
     memcpy(&head->numSlots,bufferPtr + 24,4);
     memcpy(&head->numEntries,bufferPtr + 16,4);
     memcpy(&head->numAttrs,bufferPtr + 20,4);

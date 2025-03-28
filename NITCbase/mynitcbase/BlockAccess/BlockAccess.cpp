@@ -1,6 +1,6 @@
 #include "BlockAccess.h"
 #include <cstring>
-
+#include <stdio.h>
 RecId BlockAccess::linearSearch(int relId, char attrName[ATTR_SIZE], union Attribute attrVal, int op){
     
     RecId lastRecId;
@@ -19,19 +19,17 @@ RecId BlockAccess::linearSearch(int relId, char attrName[ATTR_SIZE], union Attri
         block = lastRecId.block;
         slot = lastRecId.slot + 1;
     }
-//ALERT    
-//I AM MAKING A MODIFICATION SO THAT IT CHECKS IF slot >= numSlots
+
     while(block != -1){
         RecBuffer recordBlock(block);
         HeadInfo head;
 
         recordBlock.getHeader(&head);
 
-        unsigned char slotMap[head.numSlots];
+        unsigned char slotMap[relCatEntry.numSlotsPerBlk];
         recordBlock.getSlotMap(slotMap);
 
-        // if(slot >= relCatEntry.numSlotsPerBlk){
-        if(slot >= head.numSlots){
+        if(slot >= relCatEntry.numSlotsPerBlk){
             block = head.rblock;
             slot = 0;
             continue;
@@ -404,7 +402,7 @@ int BlockAccess::deleteRelation(char relName[ATTR_SIZE]) {
     RecId relCatRecId = BlockAccess::linearSearch(RELCAT_RELID,relcatAttrRelname,relNameAttr,EQ);
     // if the relation does not exist (linearSearch returned {-1, -1})
     //     return E_RELNOTEXIST
-    if(relCatRecId.block == -1 || relCatRecId.slot == -1) return E_RELNOTEXIST;
+    if(relCatRecId.block == -1 && relCatRecId.slot == -1) return E_RELNOTEXIST;
 
     Attribute relCatEntryRecord[RELCAT_NO_ATTRS];
     /* store the relation catalog record corresponding to the relation in
@@ -455,11 +453,11 @@ int BlockAccess::deleteRelation(char relName[ATTR_SIZE]) {
         RecId attrCatRecId = BlockAccess::linearSearch(ATTRCAT_RELID,relcatAttrRelname,relNameAttr,EQ);
         // if no more attributes to iterate over (attrCatRecId == {-1, -1})
         //     break;
-        if(attrCatRecId.block != -1 || attrCatRecId.slot != -1){
+        if(attrCatRecId.block == -1 && attrCatRecId.slot == -1){
             break;
         }
 
-        numberOfAttributesDeleted++;
+        numberOfAttributesDeleted++;        
 
         // create a RecBuffer for attrCatRecId.block
         // get the header of the block
@@ -523,6 +521,8 @@ int BlockAccess::deleteRelation(char relName[ATTR_SIZE]) {
                 RelCatEntry relCatEntryBuffer;
                 RelCacheTable::getRelCatEntry(ATTRCAT_RELID,&relCatEntryBuffer);
                 relCatEntryBuffer.lastBlk = head.lblock;
+                RelCacheTable::setRelCatEntry(ATTRCAT_RELID, &relCatEntryBuffer);
+
             }
 
             // (Since the attribute catalog will never be empty(why?), we do not
@@ -531,6 +531,8 @@ int BlockAccess::deleteRelation(char relName[ATTR_SIZE]) {
 
             // call releaseBlock()
             attrCatBlockBuffer.releaseBlock();
+            RecId nextSearchIndex = {head.rblock, 0};
+			RelCacheTable::setSearchIndex(ATTRCAT_RELID, &nextSearchIndex);
         }
 
         // (the following part is only relevant once indexing has been implemented)

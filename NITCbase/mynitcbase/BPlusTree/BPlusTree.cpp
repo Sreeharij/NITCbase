@@ -1,6 +1,6 @@
 #include "BPlusTree.h"
 #include <stdio.h>
-#include <cstring>
+#include <cstring>    
 
 RecId BPlusTree::bPlusSearch(int relId, char attrName[ATTR_SIZE], Attribute attrVal, int op) {
     // declare searchIndex which will be used to store search index for attrName.
@@ -247,7 +247,6 @@ int BPlusTree::bPlusCreate(int relId, char attrName[ATTR_SIZE]) {
     // load the relation catalog entry into relCatEntry
     // using RelCacheTable::getRelCatEntry().
     RelCacheTable::getRelCatEntry(relId,&relCatEntry);
-
     int block = relCatEntry.firstBlk;
 
     /***** Traverse all the blocks in the relation and insert them one
@@ -275,7 +274,6 @@ int BPlusTree::bPlusCreate(int relId, char attrName[ATTR_SIZE]) {
                 // (note that bPlusInsert will destroy any existing bplus tree if
                 // insert fails i.e when disk is full)
                 int retVal = bPlusInsert(relId, attrName, record[attrCatEntryBuffer.offset], recId);
-                 
                 if (retVal == E_DISKFULL) {
                 //     // (unable to get enough blocks to build the B+ Tree.)
                     return E_DISKFULL;
@@ -600,7 +598,6 @@ int BPlusTree::splitLeaf(int leafBlockNum, Index indices[]) {
 int BPlusTree::insertIntoInternal(int relId, char attrName[ATTR_SIZE], int intBlockNum, InternalEntry intEntry) {
     // get the attribute cache entry corresponding to attrName
     // using AttrCacheTable::getAttrCatEntry().
-
     // declare intBlk, an instance of IndInternal using constructor 2 for the block
     // corresponding to intBlockNum
     AttrCatEntry attrCatEntryBuffer;
@@ -609,6 +606,7 @@ int BPlusTree::insertIntoInternal(int relId, char attrName[ATTR_SIZE], int intBl
     HeadInfo blockHeader;
     // load blockHeader with header of intBlk using BlockBuffer::getHeader().
     internalBlock.getHeader(&blockHeader);
+    
     // declare internalEntries to store all existing entries + the new entry
     InternalEntry internalEntries[blockHeader.numEntries + 1];
 
@@ -622,7 +620,6 @@ int BPlusTree::insertIntoInternal(int relId, char attrName[ATTR_SIZE], int intBl
     Update the lChild of the internalEntry immediately following the newly added
     entry to the rChild of the newly added entry.
     */
-
     int insertedIndex = -1;
     for(int entryindex = 0; entryindex < blockHeader.numEntries; entryindex++){
         InternalEntry internalBlockEntry;
