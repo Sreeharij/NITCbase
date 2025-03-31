@@ -32,4 +32,3 @@ OPEN TABLE QuizMarks;
 INSERT INTO QuizMarks VALUES FROM quizmarks.csv;
 CREATE TABLE Numbers(key NUM);
 OPEN TABLE Numbers;
-INSERT INTO Numbers VALUES FROM stage10.csv

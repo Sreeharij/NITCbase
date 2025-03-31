@@ -1,7 +1,7 @@
 #include "Frontend.h"
 
 #include <cstring>
-#include <iostream>
+
 
 int Frontend::create_table(char relname[ATTR_SIZE], int no_attrs, char attributes[][ATTR_SIZE],
                            int type_attrs[]) {
@@ -90,14 +90,20 @@ int Frontend::select_from_join_where(char relname_source_one[ATTR_SIZE], char re
                                      char relname_target[ATTR_SIZE],
                                      char join_attr_one[ATTR_SIZE], char join_attr_two[ATTR_SIZE]) {
   // Algebra::join
-  return SUCCESS;
+  return Algebra::join(relname_source_one, relname_source_two, relname_target, join_attr_one, join_attr_two);
+  // return SUCCESS;
 }
 
 int Frontend::select_attrlist_from_join_where(char relname_source_one[ATTR_SIZE], char relname_source_two[ATTR_SIZE],
                                               char relname_target[ATTR_SIZE],
                                               char join_attr_one[ATTR_SIZE], char join_attr_two[ATTR_SIZE],
                                               int attr_count, char attr_list[][ATTR_SIZE]) {
-  // Algebra::join + project
+  char temp[] = TEMP;
+  int retVal = Algebra::join(relname_source_one, relname_source_two, temp, join_attr_one, join_attr_two);
+  if(retVal != SUCCESS) return retVal;
+  retVal = Algebra::project(temp,relname_target,attr_count,attr_list);
+  OpenRelTable::closeRel(OpenRelTable::getRelId(temp));
+  Schema::deleteRel(temp);
   return SUCCESS;
 }
 

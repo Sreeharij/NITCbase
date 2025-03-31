@@ -2,8 +2,8 @@
 
 #include <cstdlib>
 #include <cstring>
-#include <iostream>
 #include <stdio.h>
+
 //ALERT: FAILURE CODE IS NOT RETURNED IN CODE(anywhere) check
 
 BlockBuffer::BlockBuffer(int blockNum){
@@ -143,7 +143,6 @@ int RecBuffer::setRecord(union Attribute *rec, int slotNum){
 
     int ret = StaticBuffer::setDirtyBit(this->blockNum);
     if(ret != SUCCESS){
-        printf("Error in code, arised from RecBuffer::setRecord function");
         return ret;
     }
 
@@ -226,7 +225,6 @@ int BlockBuffer::getFreeBlock(int blockType){
     int bufferIndex = StaticBuffer::getFreeBuffer(blockNum);
 
 	if (bufferIndex < 0 && bufferIndex >= BUFFER_CAPACITY) {
-		printf ("Error from getFreeBlock function\n");
 		return bufferIndex;
 	}
     HeadInfo head;
